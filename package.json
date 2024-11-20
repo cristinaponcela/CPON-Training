@@ -5,6 +5,7 @@
   "main": "estlint.js",
   "scripts": {
     "lint": "eslint .",
+  "lint:fix": "eslint . --fix",
     "test": "jest"
   },
   "keywords": [],

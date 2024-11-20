@@ -3,11 +3,9 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - master
       - ci
   pull_request:
     branches:
-      - master
       - ci
 
 jobs:
