@@ -27,27 +27,28 @@ jobs:
           secrets: |
             static2/data/github/shared/ci/manual ARTIFACTORY_USERNAME ;
             static2/data/github/shared/ci/manual ARTIFACTORY_ACCESS_TOKEN
-            
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '21'
 
       - name: Install Dependencies
-        env:
-          ARTIFACTORY_ACCESS_TOKEN: ${{ steps.vault.outputs.access_token }}
-          ARTIFACTORY_USERNAME: ${{ steps.vault.outputs.username }}
-        run: npm ci
+        run: |
+          npm ci \
+            --progress=plain \
+            --secret id=ARTIFACTORY_ACCESS_TOKEN,env=ARTIFACTORY_ACCESS_TOKEN \
+            --secret id=ARTIFACTORY_USERNAME,env=ARTIFACTORY_USERNAME
 
       - name: Run Linter
         run: npm run lint
 
       - name: Build Project
-        env:
-          ARTIFACTORY_ACCESS_TOKEN: ${{ steps.vault.outputs.access_token }}
-          ARTIFACTORY_USERNAME: ${{ steps.vault.outputs.username }}
         run: |
-          npm run build --progress=plain
+          npm run build \
+            --progress=plain \
+            --secret id=ARTIFACTORY_ACCESS_TOKEN,env=ARTIFACTORY_ACCESS_TOKEN \
+            --secret id=ARTIFACTORY_USERNAME,env=ARTIFACTORY_USERNAME
 
       - name: Run Tests
         run: npm test
