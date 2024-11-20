@@ -1,0 +1,6 @@
+[[tool.poetry.source]]
+priority = "primary"
+name = "bendingspoons-proxy"
+url = "https://proxy.registry.bendingspoons.com/pypi/simple"
+
+

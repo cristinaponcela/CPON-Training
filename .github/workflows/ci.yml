@@ -1,4 +1,4 @@
-name: TypeScript Linting and Tests
+name: TypeScript Linting, Build, and Tests
 
 on:
   push:
@@ -18,6 +18,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Fetch Artifactory secrets from Vault
+        id: vault
         uses: hashicorp/vault-action@v3
         with:
           method: jwt
@@ -25,8 +26,8 @@ jobs:
           role: github-${{ github.repository_owner }}-${{ github.event.repository.name }}
           url: https://vault.bendingspoons.com
           secrets: |
-            static2/data/github/shared/ci/manual ARTIFACTORY_USERNAME ;
-            static2/data/github/shared/ci/manual ARTIFACTORY_ACCESS_TOKEN
+            static2/data/github/shared/ci/manual ARTIFACTORY_USERNAME=username ;
+            static2/data/github/shared/ci/manual ARTIFACTORY_ACCESS_TOKEN=access_token
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -34,17 +35,20 @@ jobs:
           node-version: '21'
 
       - name: Install Dependencies
+        env:
+          ARTIFACTORY_ACCESS_TOKEN: ${{ steps.vault.outputs.access_token }}
+          ARTIFACTORY_USERNAME: ${{ steps.vault.outputs.username }}
         run: npm ci
 
       - name: Run Linter
         run: npm run lint
 
       - name: Build Project
+        env:
+          ARTIFACTORY_ACCESS_TOKEN: ${{ steps.vault.outputs.access_token }}
+          ARTIFACTORY_USERNAME: ${{ steps.vault.outputs.username }}
         run: |
-          npm run build \
-            --progress=plain \
-            --secret id=ARTIFACTORY_ACCESS_TOKEN,env=ARTIFACTORY_ACCESS_TOKEN \
-            --secret id=ARTIFACTORY_USERNAME,env=ARTIFACTORY_USERNAME
+          npm run build --progress=plain
 
       - name: Run Tests
         run: npm test
