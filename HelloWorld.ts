@@ -12,3 +12,6 @@ if (today.toLocaleDateString() === trueToday) {
   } else {
     console.error('Test failed: today does not match trueToday');
   }
+
+
+// verified test
