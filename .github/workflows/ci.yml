@@ -8,11 +8,25 @@ on:
 
 jobs:
   build:
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Fetch Artifactory secrets from Vault
+        uses: hashicorp/vault-action@v3
+        with:
+          method: jwt
+          path: jwt-github-actions
+          role: github-${{ github.repository_owner }}-${{ github.event.repository.name }}
+          url: https://vault.bendingspoons.com
+          secrets: |
+            static2/data/github/shared/ci/manual ARTIFACTORY_USERNAME ;
+            static2/data/github/shared/ci/manual ARTIFACTORY_ACCESS_TOKEN
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -24,6 +38,13 @@ jobs:
 
       - name: Run Linter
         run: npm run lint
+
+      - name: Build Project
+        run: |
+          npm run build \
+            --progress=plain \
+            --secret id=ARTIFACTORY_ACCESS_TOKEN,env=ARTIFACTORY_ACCESS_TOKEN \
+            --secret id=ARTIFACTORY_USERNAME,env=ARTIFACTORY_USERNAME
 
       - name: Run Tests
         run: npm test
