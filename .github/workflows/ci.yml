@@ -2,10 +2,11 @@ name: TypeScript Linting and Tests
 
 on:
   push:
-    branches: [ 'ci' ]
+    branches:
+      - '*'
   pull_request:
-    branches: [ 'ci' ]
-
+    branches:
+      - '*'
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
