@@ -43,6 +43,12 @@ jobs:
       - name: Run Linter
         run: npm run lint
 
+      - name: Authenticate to GCP using Workload Identity
+        uses: google-github-actions/auth@v2
+        with:
+          service_account: deploy@<handle>-training-42@.iam.gserviceaccount.com
+          workload_identity_provider: projects/286246949275/locations/global/workloadIdentityPools/github-actions/providers/bendingspoons
+
       - name: Build Project
         run: |
           npm run build \
